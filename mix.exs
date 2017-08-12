@@ -32,7 +32,7 @@ defmodule OAuth2Facebook.Mixfile do
      # Test dependencies
      {:poison, "~> 3.0", only: :test},
      {:bypass, "~> 0.6", only: :test},
-     {:excoveralls, "~> 0.5", only: :test},
+     {:excoveralls, "~> 0.7", only: :test},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
 
      # Docs dependencies
