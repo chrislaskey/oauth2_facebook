@@ -25,6 +25,11 @@ defmodule OAuth2.Provider.FacebookTest do
     assert result.authorize_url == "new"
   end
 
+  test "authorize_url!", %{client: client, server: server} do
+    result = Facebook.authorize_url!([], [])
+    assert Regex.match?(~r/facebook.com/, result)
+  end
+
   test "authorize_url", %{client: client, server: server} do
     client = Facebook.authorize_url(client, [])
     assert "http://localhost:#{server.port}" == client.site
