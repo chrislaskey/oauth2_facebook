@@ -15,6 +15,16 @@ defmodule OAuth2.Provider.FacebookTest do
     {:ok, client: client, server: server}
   end
 
+  test "client created with default values" do
+    result = Facebook.client
+    assert result.authorize_url == "https://www.facebook.com/dialog/oauth"
+  end
+
+  test "client takes optional values" do
+    result = Facebook.client(authorize_url: "new")
+    assert result.authorize_url == "new"
+  end
+
   test "authorize_url", %{client: client, server: server} do
     client = Facebook.authorize_url(client, [])
     assert "http://localhost:#{server.port}" == client.site
