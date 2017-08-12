@@ -3,6 +3,7 @@
 > A Facebook OAuth2 Provider for Elixir
 
 [![Build Status](https://travis-ci.org/chrislaskey/oauth2_facebook.svg?branch=master)](https://travis-ci.org/chrislaskey/oauth2_facebook)
+[![Coverage Status](https://coveralls.io/repos/github/chrislaskey/oauth2_facebook/badge.svg?branch=master)](https://coveralls.io/github/chrislaskey/oauth2_facebook?branch=master)
 
 ## Install
 
