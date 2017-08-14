@@ -7,7 +7,7 @@ defmodule OAuth2Facebook.Mixfile do
     [app: :oauth2_facebook,
      name: "OAuth2 Facebook",
      version: @version,
-     elixir: "~> 1.4",
+     elixir: "~> 1.3",
      deps: deps(),
      package: package(),
      description: description(),
