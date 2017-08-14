@@ -2,7 +2,7 @@ defmodule OAuth2.Provider.Facebook do
   @moduledoc """
   OAuth2 Facebook Provider
 
-	Based on github.com/ueberauth/ueberauth_facebook
+  Based on github.com/ueberauth/ueberauth_facebook
 
   Add `client_id` and `client_secret` to your configuration:
 
@@ -36,8 +36,7 @@ defmodule OAuth2.Provider.Facebook do
   end
 
   @doc """
-  Provides the authorize url for the request phase of Ueberauth.
-  No need to call this usually.
+  Provides the authorize url for the request phase.
   """
   def authorize_url!(params \\ [], opts \\ []) do
     opts
@@ -45,10 +44,22 @@ defmodule OAuth2.Provider.Facebook do
     |> OAuth2.Client.authorize_url!(params)
   end
 
+  @doc """
+  Returns an OAuth2.Client with token.
+  """
   def get_token!(params \\ [], opts \\ []) do
     opts
     |> client
     |> OAuth2.Client.get_token!(params)
+  end
+
+  @doc """
+  Returns user information only.
+  To return token before querying for user, see `get_user/3`
+  """
+  def get_user!(params \\ [], opts \\ [], query_params \\ []) do
+    OAuth2.Provider.Facebook.get_token!(params, opts)
+    |> get_user(query_params)
   end
 
   # Strategy Callbacks
@@ -64,10 +75,37 @@ defmodule OAuth2.Provider.Facebook do
     |> OAuth2.Strategy.AuthCode.get_token(params, headers)
   end
 
+  @doc """
+  Returns user information from Facebook graph's `/me` endpoint using the access_token.
+  """
+  def get_user(client, query_params \\ []) do
+    path = "/me?" <> user_query(client.token.access_token, query_params)
+    case OAuth2.Client.get(client, path) do
+      {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
+        {:error, "Unauthorized"}
+      {:ok, %OAuth2.Response{status_code: status_code, body: user}}
+        when status_code in 200..399 ->
+        {:ok, user}
+      {:error, %OAuth2.Error{reason: reason}} ->
+        {:error, reason}
+    end
+  end
+
   # Helpers
 
-  def appsecret_proof(token) do
-    token.access_token
+  defp user_query(access_token, query_params) do
+    Enum.into(query_params, %{})
+    |> Map.put("fields", query_value(:user_fields))
+    |> Map.put("appsecret_proof", appsecret_proof(access_token))
+    |> URI.encode_query
+  end
+
+  defp query_value(:user_fields) do
+    "id,email,gender,link,locale,name,timezone,updated_time,verified"
+  end
+
+  def appsecret_proof(access_token) do
+    access_token
     |> hmac(:sha256, get_config(:client_secret))
     |> Base.encode16(case: :lower)
   end

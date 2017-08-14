@@ -70,7 +70,9 @@ defmodule OAuth2.Provider.FacebookTest do
   end
 
   test "appsecret_proof" do
-    token = %AccessToken{ access_token: "test-value" }
-    assert Facebook.appsecret_proof(token) == "124ed8be8bca56fc1cbf60c697077713ea893375edb8c825529522c8c336a4a6"
+    result = Facebook.appsecret_proof("test-value")
+    expected = "124ed8be8bca56fc1cbf60c697077713ea893375edb8c825529522c8c336a4a6"
+
+    assert result == expected
   end
 end
