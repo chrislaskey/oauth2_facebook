@@ -79,8 +79,7 @@ defmodule OAuth2.Provider.Facebook do
   Returns user information from Facebook graph's `/me` endpoint using the access_token.
   """
   def get_user(client, query_params \\ []) do
-    path = "/me?" <> user_query(client.token.access_token, query_params)
-    case OAuth2.Client.get(client, path) do
+    case OAuth2.Client.get(client, user_path(client query_params)) do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         {:error, "Unauthorized"}
       {:ok, %OAuth2.Response{status_code: status_code, body: user}}
@@ -92,6 +91,10 @@ defmodule OAuth2.Provider.Facebook do
   end
 
   # Helpers
+
+  def user_path(client, query_params \\ []) do
+    "/me?" <> user_query(client.token.access_token, query_params)
+  end
 
   defp user_query(access_token, query_params) do
     Enum.into(query_params, %{})

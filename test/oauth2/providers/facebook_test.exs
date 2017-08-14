@@ -25,7 +25,7 @@ defmodule OAuth2.Provider.FacebookTest do
     assert result.authorize_url == "new"
   end
 
-  test "authorize_url!", %{client: client, server: server} do
+  test "authorize_url!" do
     result = Facebook.authorize_url!([], [])
     assert Regex.match?(~r/facebook.com/, result)
   end
@@ -67,6 +67,16 @@ defmodule OAuth2.Provider.FacebookTest do
     assert_raise OAuth2.Error, ~r/Missing required key/, fn ->
       Facebook.get_token(build_client(), [], [])
     end
+  end
+
+  test "user_path", %{client: client} do
+    access_token = %AccessToken{access_token: "test-token"}
+    client = Map.put(client, :token, access_token)
+
+    result = Facebook.user_path(client)
+    expected = "/me?appsecret_proof=4b7ac26ded30aa0308ad850fd10ebf251676997fd03a1700748b03beb23ada32&fields=id%2Cemail%2Cgender%2Clink%2Clocale%2Cname%2Ctimezone%2Cupdated_time%2Cverified"
+
+    assert result == expected
   end
 
   test "appsecret_proof" do
