@@ -74,7 +74,21 @@ defmodule OAuth2.Provider.FacebookTest do
     client = Map.put(client, :token, access_token)
 
     result = Facebook.user_path(client)
-    expected = "/me?appsecret_proof=4b7ac26ded30aa0308ad850fd10ebf251676997fd03a1700748b03beb23ada32&fields=id%2Cemail%2Cgender%2Clink%2Clocale%2Cname%2Ctimezone%2Cupdated_time%2Cverified"
+    expected = "/me?appsecret_proof=4b7ac26ded30aa0308ad850fd10ebf251676997fd03a1700748b03beb23ada32&fields=id%2Cemail%2Cgender%2Clink%2Clocale%2Cname%2Cfirst_name%2Clast_name%2Ctimezone%2Cupdated_time%2Cverified"
+
+    assert result == expected
+  end
+
+  test "user_path takes custom params", %{client: client} do
+    access_token = %AccessToken{access_token: "test-token"}
+    client = Map.put(client, :token, access_token)
+    custom_params = [
+      appsecret_proof: nil,
+      fields: "email"
+    ]
+
+    result = Facebook.user_path(client, custom_params)
+    expected = "/me?fields=email"
 
     assert result == expected
   end

@@ -15,12 +15,16 @@ defmodule OAuth2.Provider.Facebook do
   """
   use OAuth2.Strategy
 
-  @defaults [
+  @client_defaults [
     strategy: __MODULE__,
     site: "https://graph.facebook.com",
     authorize_url: "https://www.facebook.com/dialog/oauth",
     token_url: "/v2.8/oauth/access_token",
     token_method: :get
+  ]
+
+  @query_defaults [
+    user_fields: "id,email,gender,link,locale,name,first_name,last_name,timezone,updated_time,verified"
   ]
 
   @doc """
@@ -31,7 +35,7 @@ defmodule OAuth2.Provider.Facebook do
   """
   def client(opts \\ []) do
     opts =
-      @defaults
+      @client_defaults
       |> Keyword.merge(config())
       |> Keyword.merge(opts)
 
@@ -100,14 +104,19 @@ defmodule OAuth2.Provider.Facebook do
   end
 
   defp user_query(access_token, query_params) do
-    Enum.into(query_params, %{})
-    |> Map.put("fields", query_value(:user_fields))
-    |> Map.put("appsecret_proof", appsecret_proof(access_token))
+    custom_params = Enum.into(query_params, %{})
+
+    %{}
+    |> Map.put(:fields, query_value(:user_fields))
+    |> Map.put(:appsecret_proof, appsecret_proof(access_token))
+    |> Map.merge(custom_params)
+    |> Enum.filter(fn {_, v} -> v != nil and v != "" end)
     |> URI.encode_query
   end
 
-  defp query_value(:user_fields) do
-    "id,email,gender,link,locale,name,first_name,last_name,timezone,updated_time,verified"
+  defp query_value(key) do
+    @query_defaults
+    |> Keyword.get(key)
   end
 
   def appsecret_proof(access_token) do
