@@ -15,13 +15,12 @@ OAuth2 Facebook is convenience library built on top of [`oauth2`](https://hex.pm
 def application do
   # Add the application to your list of applications.
   # This will ensure that it will be included in a release.
-  [applications: [:logger, :oauth2, :oauth2_facebook]]
+  [applications: [:logger, :oauth2_facebook]]
 end
 
 defp deps do
   # Add the dependency
-  [{:oauth2, "~> 0.9"},
-   {:oauth2_facebook, "~> 0.1"}]
+  [{:oauth2_facebook, "~> 0.1"}]
 end
 ```
 
@@ -40,7 +39,7 @@ Facebook.get_user!([code: "<callback-code>"], [redirect_uri: "..."])
 When successful, it returns the user data:
 
 ```elixir
-{:ok, %{"email" => "chris.laskey@gmail.com", "gender" => "male", "id" => "10105319932669090", "link" => "https://www.facebook.com/app_scoped_user_id/10105319932669090/", "locale" => "en_US", "name" => "Chris Laskey", "timezone" => -4, "updated_time" => "2015-06-05T14:59:20+0000", "verified" => true}}
+{:ok, %{"email" => "user@gmail.com", "gender" => "male", "id" => "101", "link" => "https://www.facebook.com/app_scoped_user_id/101/", "locale" => "en_US", "name" => "user", "timezone" => -4, "updated_time" => "2015-06-05T14:59:20+0000", "verified" => true}}
 ```
 
 ## Returning an Access Token
@@ -68,11 +67,34 @@ A valid client with an access token can then be passed into endpoint specific fu
 ```elixir
 alias OAuth2.Provider.Facebook
 
-client = Facebook.get_user(client)
+{:ok, user} = Facebook.get_user(client)
 ```
 
 When successful, it will return the same user information:
 
 ```elixir
-{:ok, %{"email" => "chris.laskey@gmail.com", "gender" => "male", "id" => "10105319932669090", "link" => "https://www.facebook.com/app_scoped_user_id/10105319932669090/", "locale" => "en_US", "name" => "Chris Laskey", "timezone" => -4, "updated_time" => "2015-06-05T14:59:20+0000", "verified" => true}}
+%{"email" => "user@gmail.com", "gender" => "male", "id" => "101", "link" => "https://www.facebook.com/app_scoped_user_id/101/", "locale" => "en_US", "name" => "user", "timezone" => -4, "updated_time" => "2015-06-05T14:59:20+0000", "verified" => true}
 ```
+
+## Filtering User fields
+
+Both `get_user!` and `get_user` support passing custom query params. These can be used to filter the returned attributes:
+
+```elixir
+alias OAuth2.Provider.Facebook
+
+# Using `get_user!`
+user = Facebook.get_user!([code: "<callback-code>"], [redirect_uri: "..."], [fields: "email,name"])
+
+# Using `get_user`
+client = Facebook.get_token!([code: "<callback-code>"], [redirect_uri: "..."])
+{:ok, user} = Facebook.get_user(client, [fields: "email,name"])
+```
+
+When successful, will return a trimmed down user:
+
+```elixir
+%{"email" => "user@gmail.com", "id" => "101", "name" => "user"}
+```
+
+**Note:** The `id` value is always returned.
