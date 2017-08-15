@@ -107,7 +107,7 @@ defmodule OAuth2.Provider.Facebook do
   end
 
   defp query_value(:user_fields) do
-    "id,email,gender,link,locale,name,timezone,updated_time,verified"
+    "id,email,gender,link,locale,name,first_name,last_name,timezone,updated_time,verified"
   end
 
   def appsecret_proof(access_token) do
