@@ -2,11 +2,14 @@ defmodule OAuth2.Provider.Facebook do
   @moduledoc """
   OAuth2 Facebook Provider
 
-  Based on github.com/ueberauth/ueberauth_facebook
+  Based on:
+
+      github.com/scrogson/oauth2
+      github.com/ueberauth/ueberauth_facebook
 
   Add `client_id` and `client_secret` to your configuration:
 
-      config :oauth2, OAuth2.Strategy.Facebook,
+      config :oauth2_facebook, OAuth2.Provider.Facebook,
         client_id: System.get_env("FACEBOOK_APP_ID"),
         client_secret: System.get_env("FACEBOOK_APP_SECRET")
   """
@@ -79,7 +82,7 @@ defmodule OAuth2.Provider.Facebook do
   Returns user information from Facebook graph's `/me` endpoint using the access_token.
   """
   def get_user(client, query_params \\ []) do
-    case OAuth2.Client.get(client, user_path(client query_params)) do
+    case OAuth2.Client.get(client, user_path(client, query_params)) do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         {:error, "Unauthorized"}
       {:ok, %OAuth2.Response{status_code: status_code, body: user}}
